@@ -6,8 +6,10 @@ import './App.css';
 const Expense = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [inputText, setInputText] = useState("");
+  const [result, setResult] = useState(null);
 
   const handleImageUpload = (event) => {
+    checkServer();
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -19,19 +21,46 @@ const Expense = () => {
     }
   };
 
-  const sendFileToServer = async (file) => {
+  // const sendFileToServer = async (file) => {
+  //   const formData = new FormData();
+  //   formData.append('image', file);
+
+  //   try {
+  //     const response = await axios.post('/image', formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     });
+  //     console.log(response.data);
+  //   } catch (error) {
+  //     console.error('There was an error uploading the image!', error);
+  //   }
+  // };
+
+  const sendFileToServer = async (file, maxRetries = 3, backoffFactor = 300) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    try {
-      const response = await axios.post('/image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error('There was an error uploading the image!', error);
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const response = await axios.post('/image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setResult(prevResult => response.data);
+        console.log(response.data);
+        return;  // Exit if the request is successful
+      } catch (error) {
+        if (attempt < maxRetries - 1) {
+          const waitTime = backoffFactor * (2 ** attempt);  // Exponential backoff
+          console.warn(`Upload failed, retrying in ${waitTime}ms...`, error);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        } else {
+          console.error('There was an error uploading the image!', error);
+          throw error;  // Rethrow the error after the final attempt
+        }
+      }
     }
   };
 
@@ -39,10 +68,20 @@ const Expense = () => {
     try {
       console.log(inputText);
       const response = await axios.post('/text', { text: inputText });
+      setResult(prevResult => response.data);
       console.log(response.data);
       setInputText("");
     } catch (error) {
       console.error('Error sending text to server:', error);
+    }
+  };
+
+  const checkServer = async () => {
+    try {
+      const response = await axios.get('/check');
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error with server:', error);
     }
   };
 

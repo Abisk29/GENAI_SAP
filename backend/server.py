@@ -9,7 +9,7 @@ CORS(app)
 
 @app.route("/check", methods=["GET"])
 def check():
-    return "Server is running!"
+    return jsonify("Server is running!")
 
 
 @app.route("/text", methods=["POST"])
