@@ -6,19 +6,29 @@ import './App.css';
 
 const Expense = () => {
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [uploadedImageFile, setUploadedImageFile] = useState(null);
   const [inputText, setInputText] = useState("");
   const [result, setResult] = useState(null);
 
   const handleImageUpload = (event) => {
-    checkServer();
     const file = event.target.files[0];
+    setUploadedImageFile(file);
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         setUploadedImage(e.target.result);
       };
       reader.readAsDataURL(file);
-      sendFileToServer(file);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (uploadedImageFile) {
+      await sendFileToServer(uploadedImageFile);
+      setUploadedImageFile(null);
+    }
+    if (inputText) {
+      await sendTextToServer(inputText);
     }
   };
 
@@ -49,24 +59,12 @@ const Expense = () => {
     }
   };
 
-  const sendTextToServer = async () => {
+  const sendTextToServer = async (text) => {
     try {
-      console.log(inputText);
-      const response = await axios.post('/text', { text: inputText });
+      const response = await axios.post('/text', { text });
       setResult(response.data);
-      console.log(response.data);
-      setInputText("");
     } catch (error) {
       console.error('Error sending text to server:', error);
-    }
-  };
-
-  const checkServer = async () => {
-    try {
-      const response = await axios.get('/check');
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error with server:', error);
     }
   };
 
@@ -81,11 +79,10 @@ const Expense = () => {
         responseType: 'blob' // Important to get the response as a blob
       });
 
-      // Create a URL for the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const a = document.createElement('a');
       a.href = url;
-      a.setAttribute('download', 'data.csv'); // Specify the filename
+      a.setAttribute('download', 'data.csv');
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -138,7 +135,7 @@ const Expense = () => {
               <input id="file-input" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
             </div>
             <input className="description-input" type="text" placeholder="Enter description..." value={inputText} onChange={(e) => setInputText(e.target.value)} />
-            <button className="submit-button" onClick={sendTextToServer}>Submit</button>
+            <button className="submit-button" onClick={handleSubmit}>Submit</button>
           </div>
           {uploadedImage && (
             <div className="image-container">
@@ -157,7 +154,6 @@ const Expense = () => {
               pagination
             />
             <button className="download-button" onClick={downloadCSV}>Download CSV</button>
-
           </div>
         )}
       </div>
