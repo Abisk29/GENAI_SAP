@@ -1,7 +1,9 @@
+import io
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import model
+import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
@@ -14,15 +16,17 @@ def check():
 
 @app.route("/text", methods=["POST"])
 def text_categorize():
+    global df
     data = request.json
     text = data.get("text")
-    result = model.text_categorize(text)
+    result, df = model.text_categorize(text)
     print(result)
     return jsonify(result)
 
 
 @app.route("/image", methods=["POST"])
 def image_categorize():
+    global df
     if "image" not in request.files:
         return jsonify({"error": "No file part"}), 400
 
@@ -35,10 +39,27 @@ def image_categorize():
         # Save the file to a temporary location
         temp_path = os.path.join("/tmp", file.filename)
         file.save(temp_path)
-        result = model.image_categorize(temp_path)
+        result, df = model.image_categorize(temp_path)
         print(result)
         os.remove(temp_path)
         return jsonify(result)
+
+
+@app.route("/download-csv", methods=["GET"])
+def download_csv():
+    global df
+    # Convert DataFrame to CSV in memory
+    csv_buffer = io.StringIO()
+    df.to_csv(csv_buffer, index=False)
+    csv_buffer.seek(0)
+
+    # Send the CSV file as a response
+    return send_file(
+        io.BytesIO(csv_buffer.getvalue().encode("utf-8")),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="data.csv",
+    )
 
 
 if __name__ == "__main__":

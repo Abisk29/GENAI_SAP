@@ -20,7 +20,10 @@ classifier = pipeline(
 
 def text_categorize(text):
     result = classifier(text)
-    return {"category": result[0]["label"]}
+    items = [text]
+    category = [result[0]["label"]]
+    data = pd.DataFrame({"items": items, "category": category})
+    return {"items": items, "class": category}, data
 
 
 def image_categorize(path):
@@ -78,8 +81,8 @@ def image_categorize(path):
         items.append(k)
 
     if len(items) == len(classification):
-        result = pd.DataFrame({"items": items, "class": classification})
-        return {"items": items, "class": classification}
+        result = pd.DataFrame({"items": items, "category": classification})
+        return {"items": items, "class": classification}, result
     else:
         print("Error: Lists have different lengths.")
     return

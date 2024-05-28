@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaPaperclip, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
+import DataTable from 'react-data-table-component';
 import './App.css';
 
 const Expense = () => {
@@ -21,22 +22,6 @@ const Expense = () => {
     }
   };
 
-  // const sendFileToServer = async (file) => {
-  //   const formData = new FormData();
-  //   formData.append('image', file);
-
-  //   try {
-  //     const response = await axios.post('/image', formData, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //       },
-  //     });
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.error('There was an error uploading the image!', error);
-  //   }
-  // };
-
   const sendFileToServer = async (file, maxRetries = 3, backoffFactor = 300) => {
     const formData = new FormData();
     formData.append('image', file);
@@ -48,7 +33,7 @@ const Expense = () => {
             'Content-Type': 'multipart/form-data',
           },
         });
-        setResult(prevResult => response.data);
+        setResult(response.data);
         console.log(response.data);
         return;  // Exit if the request is successful
       } catch (error) {
@@ -68,7 +53,7 @@ const Expense = () => {
     try {
       console.log(inputText);
       const response = await axios.post('/text', { text: inputText });
-      setResult(prevResult => response.data);
+      setResult(response.data);
       console.log(response.data);
       setInputText("");
     } catch (error) {
@@ -90,32 +75,89 @@ const Expense = () => {
     document.getElementById('file-input').value = '';
   };
 
+  const downloadCSV = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/download-csv', {
+        responseType: 'blob' // Important to get the response as a blob
+      });
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.setAttribute('download', 'data.csv'); // Specify the filename
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+    } catch (error) {
+      console.error('Error downloading the file:', error);
+    }
+  };
+
+  const columns = [
+    {
+      name: 'Item',
+      selector: row => row.item,
+      sortable: true,
+    },
+    {
+      name: 'Class',
+      selector: row => row.class,
+      sortable: true,
+    }
+  ];
+
+  const data = result?.items?.map((item, index) => ({
+    item: item,
+    class: result.class[index],
+  })) || [];
+
   return (
     <div className='component'>
-      <div className="text">
-        SORT and SAVE,<br></br>
-        your Money, your Way
-      </div>
-      <div className="description">
-        Effortlessly navigate your finances!<br></br>
-        Categorize expenses, chart your budget, and thrive financially with ease
+      <div className='component'>
+        <div className="text-container">
+          <div className="text">
+            SORT and SAVE,<br />
+            your Money, your Way
+          </div>
+          <div className="description">
+            Effortlessly navigate your finances!<br />
+            Categorize expenses, chart your budget, and thrive financially with ease
+          </div>
+        </div>
       </div>
 
-      <div className="form-container">
-        <div className="input-container">
-          <div className="icon">
-            <label htmlFor="file-input">
-              <FaPaperclip size={20} />
-            </label>
-            <input id="file-input" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+      <div className="form-result-wrapper">
+        <div className="form-container">
+          <div className="input-container">
+            <div className="icon">
+              <label htmlFor="file-input">
+                <FaPaperclip size={20} />
+              </label>
+              <input id="file-input" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+            </div>
+            <input className="description-input" type="text" placeholder="Enter description..." value={inputText} onChange={(e) => setInputText(e.target.value)} />
+            <button className="submit-button" onClick={sendTextToServer}>Submit</button>
           </div>
-          <input className="description-input" type="text" placeholder="Enter description..." value={inputText} onChange={(e) => setInputText(e.target.value)} />
-          <button className="submit-button" onClick={sendTextToServer}>Submit</button>
+          {uploadedImage && (
+            <div className="image-container">
+              <img className="uploaded-image" src={uploadedImage} alt="Uploaded" />
+              <button className="close-button" onClick={handleRemoveImage}><FaTimes size={20} /></button>
+            </div>
+          )}
         </div>
-        {uploadedImage && (
-          <div className="image-container">
-            <img className="uploaded-image" src={uploadedImage} alt="Uploaded" />
-            <button className="close-button" onClick={handleRemoveImage}><FaTimes size={20} /></button>
+
+        {result && (
+          <div className="result-container">
+            <DataTable
+              className="dataTable-container"
+              columns={columns}
+              data={data}
+              pagination
+            />
+            <button className="download-button" onClick={downloadCSV}>Download CSV</button>
+
           </div>
         )}
       </div>
