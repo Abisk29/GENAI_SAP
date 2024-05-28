@@ -1,13 +1,19 @@
 import React from 'react';
-import './App.css';
-import Expense from './Expense'; 
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './Login';
+import Signup from './Signup';
+import Expense from './Expense';
 
-function App() {
+const App = () => {
   return (
-    <div className="container">
-      <Expense />
-    </div>
+    <Router>
+        <Routes>
+          <Route exact path="/" element={<Login/>} />
+          <Route exact path="/Signup" element={<Signup/>}/>
+          <Route exact path="/Expense" element={<Expense/>} />
+        </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
