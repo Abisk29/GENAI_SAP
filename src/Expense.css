@@ -2,6 +2,8 @@
   display: block;
   height: 100vh;
   background-image: url('./BACKGROUND.png');
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .text-container {
   display: block;

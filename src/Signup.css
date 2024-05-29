@@ -8,6 +8,8 @@
   justify-content: flex-end;
   align-items: center;
   height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 h1 {
