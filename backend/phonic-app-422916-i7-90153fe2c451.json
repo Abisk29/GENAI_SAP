@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "phonic-app-422916-i7",
+  "private_key_id": "90153fe2c451e741f01b78eb9f81d7ce1ca74d4f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC4k2bm1xPDN8Vf\n1Yw/lmlQC5gUxBGelB59rPCNgaj2t6c6KHZfqCbmvqhbUyKlbyNMN+mwhW5vD38Q\nremE9SkwtwxZhrOvRnd/yp9CjlGryD2gV552G1IbnMmVtJFlIOLZiY4uwDI5tM34\nMrad8kIRjHSITTbZV055wV3EdkzyIf52xVksWYUec4Un+6OCwUbaiFTKEiiIYp2q\nDvobEdS4sIMO7mANr+cB6KyZ4UwVjSyizvthiK5XWGU6I6mQOYH58sqN9Bi0Ljx/\n1T6iHRGAHmUh8QqidOFRe9v5IvkBk3YBrBsJHVa75Avu/wGKXAl0Xnlm7w906aDD\ngFFpnul7AgMBAAECggEAAOidZLRDwTVgLc5MsThhLK2J7xf4aMS+xUg3cCYZworG\nUEeMg8ToLw2e5Y6ZQCpgiIqfqHVxTZGqQsX+Rb3K1OLL8M0FdkyrE1W+uhn8ZQJ3\nhIiGsRSfjSf7RjTUqTVsVlbSdBGZa5DW7t/VkoPzsvriRGFg7oNyavRtxoL9YYRv\nHfRkbOfgDxUyErcoUm8JYmCmZsS/ny6i/1xfAAOMFI3WFYeVXvUPcBJ39ANLbLyB\nQw6wjsE0GtHZxgJZyKp0VOMb9PWfvRxqpyAvby0ueE6Hy1tq6bMgOXXNSSSF7R0i\nto9vn7HRcoyQJxDu4t6Yp0khyfeYS4oCfmM7P08ABQKBgQDf1vn+DdqgdZZuqgDu\nuZrg3u2v9YqqliddqDHKXw3gixCx/KjVCK2/zBeyIY/lG3OB/6tPwYdTfpb4Z+X/\nq225QsJon6xKyRmEtqtZRW16t0leSizE5QicJHvUsvQv4JSlPAnhzNWApufgWUUW\n+Wy7SL3I0sZ8hObPGhRw3gfwRwKBgQDTGEMiBGqbvx3sRU0eN+zAbVxLNMpc3E/K\nY/Y8/1EwiKzTZkXi7iG19MyzNGKriN/7jForf0rPOvg7muPte/mENMNTJOmzQaGP\np87CB7FTAUYl9O4xBD/DiKbHjLBUxtxpEZUrncqRGj1x8UcPP7KB3bhvRtxgvJ3j\n1ZkGOtRrLQKBgDpVNMr/Y0VDv5NRXHLaDcGidwDPFXcFMHcY2PjrMpucwhoQRRNX\ncqg0EMzMMEq9j6mGLmfXgGPC7qcHtImfbDXGbxGC4wyOQcczL45RKIm9cDJRVD9v\njIHchCTXCgncFgDFl7GvhshDNtRhjz7Ae5SHDWZjf3R90gSQwFj1k84LAoGBAJBr\nh/ps9RbrESjFXPZwonwgFcWqL0yKudgovZ2Lu9stlrfmv6d67ftTqPxtuZfLxBmQ\nM1yQ8PiISq5U0N14NQQ7KOroVS77lvH2h6D9rFayh3COeqt0Ub+P7TKW0Uie6MrF\nab32bVEKl8EtpkULejAZJgaTf1B7mrX2O4QkmZFdAoGBAN6YO05EnolSx55CeMRm\nhlJKnw+vgXY3WbQmK0QwY+6DGnmD0O9/nXmCqiVSZTKCJk+8rnOhQHwQTS4t5eXm\nhmeXB/ygTDIHtE38eLSmf8P4N5YFUs06E5/zJPWKXbNTbjjCXi92sS5XVm+7pMbD\n7ip2623I2ErdaX5l3CaOyTtm\n-----END PRIVATE KEY-----\n",
+  "client_email": "slm-979@phonic-app-422916-i7.iam.gserviceaccount.com",
+  "client_id": "105459784090890645220",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/slm-979%40phonic-app-422916-i7.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

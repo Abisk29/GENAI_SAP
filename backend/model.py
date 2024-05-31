@@ -4,6 +4,10 @@ from peft import PeftModel
 import re
 import torch
 import pandas as pd
+import os
+import spacy
+from google.cloud import vision
+
 
 """Importing model"""
 tokenizer = AlbertTokenizer.from_pretrained("backend\\albert")
@@ -26,11 +30,12 @@ def text_categorize(text):
     return {"items": items, "class": category}, data
 
 
-def image_categorize(path):
+def image_categorize(path, flag):
     """OCR"""
 
     input_doc = mindee_client.source_from_path(path)
-    result: PredictResponse = mindee_client.parse(product.ReceiptV5, input_doc)
+    result: PredictResponse = mindee_client.parse(product.InvoiceV4, input_doc)
+
     x = result.document
 
     class Document:
@@ -43,46 +48,53 @@ def image_categorize(path):
     doc = Document(x)
     doc_str = str(doc)
 
-    """text extraction"""
-    item_pattern = r"\| (.+?) +\| (\d+\.\d+) +\| (\d+\.\d+) +\|"
+    item_pattern = r"\| (.+?) +\| +\d+\.\d+ +\|"
 
-    items = re.findall(item_pattern, doc_str)
     l = []
-
+    items = re.findall(item_pattern, doc_str)
     for item in items:
-        description, quantity, total_amount = item
-        l.append(description)
-    s = set(l)
-    l = list(s)
+        s = item.replace("|", "").strip()
+        if s != "" and s not in l:
+            l.append(item.replace("|", "").strip())
 
-    unique_items = []
+    if len(l) == 0:
+        print("Google text")
+        # Load SpaCy's English language model
+        nlp = spacy.load("en_core_web_sm")
 
-    seen_descriptions = set()
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
+            "backend\\phonic-app-422916-i7-90153fe2c451.json"
+        )
 
-    for item in items:
-        description, quantity, total_amount = item
+        """Detects and prints nouns along with their respective adjectives from text annotations."""
+        client = vision.ImageAnnotatorClient()
 
-        if description not in seen_descriptions:
-            unique_items.append((description, quantity, total_amount))
-            seen_descriptions.add(description)
+        with open(path, "rb") as image_file:
+            content = image_file.read()
 
-    unique_items_list = list(unique_items)
+        image = vision.Image(content=content)
 
-    for item in unique_items_list:
-        print(f"Description: {item[0]}, Quantity: {item[1]}, Total Amount: {item[2]}")
+        response = client.text_detection(image=image)
+        texts = response.text_annotations
+        s = ""
+        for text in texts:
+            # Use SpaCy to perform part-of-speech tagging
+            doc = nlp(text.description)
+            s = s + str(doc)
+            # Iterate through tokens to find nouns with their respective adjectives
+        s = s[:500]
+        return text_categorize(s)
 
-    items = []
-    classification = []
+        if response.error.message:
+            raise Exception(
+                "{}\nFor more info on error messages, check: "
+                "https://cloud.google.com/apis/design/errors".format(
+                    response.error.message
+                )
+            )
 
-    for i in unique_items_list:
-        classification.append(classifier(str(i))[0]["label"])
-
-    for k in l:
-        items.append(k)
-
-    if len(items) == len(classification):
-        result = pd.DataFrame({"items": items, "category": classification})
-        return {"items": items, "class": classification}, result
-    else:
-        print("Error: Lists have different lengths.")
-    return
+    c = []
+    for items in l:
+        c.append(classifier("product " + items)[0]["label"])
+    data = pd.DataFrame({"items": l, "category": c})
+    return {"items": l, "class": c}, data

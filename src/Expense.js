@@ -9,6 +9,8 @@ const Expense = () => {
   const [uploadedImageFile, setUploadedImageFile] = useState(null);
   const [inputText, setInputText] = useState("");
   const [result, setResult] = useState(null);
+  const [combinedData, setCombinedData] = useState([]);
+  const [flag, setFlag] = useState(0);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -39,6 +41,7 @@ const Expense = () => {
   ) => {
     const formData = new FormData();
     formData.append("image", file);
+    formData.append("flag", flag);
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
@@ -47,8 +50,7 @@ const Expense = () => {
             "Content-Type": "multipart/form-data",
           },
         });
-        setResult(response.data);
-        console.log(response.data);
+        updateCombinedData(response.data);
         return; // Exit if the request is successful
       } catch (error) {
         if (attempt < maxRetries - 1) {
@@ -66,9 +68,19 @@ const Expense = () => {
   const sendTextToServer = async (text) => {
     try {
       const response = await axios.post("/text", { text });
-      setResult(response.data);
+      updateCombinedData(response.data);
     } catch (error) {
       console.error("Error sending text to server:", error);
+    }
+  };
+
+  const updateCombinedData = (newResult) => {
+    if (newResult) {
+      const newData = newResult.items.map((item, index) => ({
+        item: item.length > 20 ? item.slice(0, 20) : item,
+        class: newResult.class[index],
+      }));
+      setCombinedData((prevData) => [...prevData, ...newData]);
     }
   };
 
@@ -80,7 +92,7 @@ const Expense = () => {
   const downloadCSV = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:5000/download-csv", {
-        responseType: "blob", // Important to get the response as a blob
+        responseType: "blob",
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -95,6 +107,10 @@ const Expense = () => {
     }
   };
 
+  const toggleFlag = () => {
+    setFlag((prevFlag) => (prevFlag === 0 ? 1 : 0));
+  };
+
   const columns = [
     {
       name: "Item",
@@ -107,12 +123,6 @@ const Expense = () => {
       sortable: true,
     },
   ];
-
-  const data =
-    result?.items?.map((item, index) => ({
-      item: item,
-      class: result.class[index],
-    })) || [];
 
   return (
     <div className="expense">
@@ -172,17 +182,24 @@ const Expense = () => {
               </div>
             )}
           </div>
-
-          {result && (
+          {combinedData.length > 0 && (
             <div className="result-container">
               <DataTable
                 className="dataTable-container"
                 columns={columns}
-                data={data}
+                data={combinedData}
                 pagination
+                paginationPerPage={5}
               />
               <button className="download-button" onClick={downloadCSV}>
                 Download CSV
+              </button>
+              <button
+                className="submit-button"
+                style={{ marginLeft: 12 }}
+                onClick={(e) => setCombinedData([])}
+              >
+                Clear
               </button>
             </div>
           )}

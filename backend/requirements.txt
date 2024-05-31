@@ -1,0 +1,26 @@
+# Transformers for NLP tasks
+transformers
+
+# Mindee for OCR and document parsing
+mindee
+
+# PEFT for parameter-efficient fine-tuning
+peft
+
+# Torch for deep learning
+torch
+
+# Pandas for data manipulation
+pandas
+
+# SpaCy for NLP tasks
+spacy
+
+# Flask for creating the web server
+Flask
+
+# Flask-CORS for handling CORS in Flask
+Flask-CORS
+
+# Google Cloud Vision for image analysis
+google-cloud-vision

@@ -7,6 +7,7 @@ import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
+df = pd.DataFrame()
 
 
 @app.route("/check", methods=["GET"])
@@ -19,7 +20,8 @@ def text_categorize():
     global df
     data = request.json
     text = data.get("text")
-    result, df = model.text_categorize(text)
+    result, df1 = model.text_categorize(text)
+    df = pd.concat([df, df1], ignore_index=True)
     print(result)
     return jsonify(result)
 
@@ -36,10 +38,12 @@ def image_categorize():
         return jsonify({"error": "No selected file"}), 400
 
     if file:
+        flag = request.form.get("flag", default=0, type=int)
         # Save the file to a temporary location
         temp_path = os.path.join("/tmp", file.filename)
         file.save(temp_path)
-        result, df = model.image_categorize(temp_path)
+        result, df1 = model.image_categorize(temp_path, flag)
+        df = pd.concat([df, df1], ignore_index=True)
         print(result)
         os.remove(temp_path)
         return jsonify(result)
