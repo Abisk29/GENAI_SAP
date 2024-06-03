@@ -77,7 +77,7 @@ const Expense = () => {
   const updateCombinedData = (newResult) => {
     if (newResult) {
       const newData = newResult.items.map((item, index) => ({
-        item: item.length > 20 ? item.slice(0, 20) : item,
+        item: item.length > 40 ? item.slice(0, 20) : item,
         class: newResult.class[index],
       }));
       setCombinedData((prevData) => [...prevData, ...newData]);
@@ -126,11 +126,14 @@ const Expense = () => {
 
   return (
     <div className="expense">
+      <a href="http://localhost:3000" className="logout-link">
+        Logout
+      </a>
       <div className="component">
         <div className="component">
           <div className="text-container">
             <div className="text">
-              SORT and SAVE,
+              Sort and Save,
               <br />
               your Money, your Way
             </div>
